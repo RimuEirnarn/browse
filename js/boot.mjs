@@ -125,22 +125,19 @@ class BootSequence {
 
     const bootloader = document.querySelector(".bootloader");
     if (bootloader) {
-      // Disable overflow to hide scrollbars before animation
       const syslog = bootloader.querySelector(".boot-syslog");
       if (syslog) {
         document.documentElement.style.overflow = "hidden"
         syslog.style.overflow = "hidden";
       }
 
-      // Apply dissolve animation
       bootloader.classList.add("dissolving");
 
-      // Remove after animation completes
       setTimeout(() => {
         bootloader.remove();
         this.logger.info("Bootloader UI removed");
         document.documentElement.style.overflow = ""
-      }, 800); // Match animation duration
+      }, 800);
     }
   }
 
