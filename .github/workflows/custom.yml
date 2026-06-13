@@ -37,7 +37,7 @@ jobs:
 #      - name: Install build dependency
 #        run: pip install -r requirements.txt
       - name: Build site content
-        run: scripts/build.sh
+        run: chmod 755 scripts/build.sh && scripts/build.sh
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
