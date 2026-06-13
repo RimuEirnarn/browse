@@ -1,0 +1,155 @@
+:root {
+  --font-family: "Press Start 2P";
+  --primary: #2E6C7B;
+  --primary-light: #B3EBF2;
+}
+
+.endfield {
+  --background-url: url('../img/ENDFIELD_RIMU_AERISYA.webp');
+  --backdrop-blur: 10px;
+  background: no-repeat center var(--background-url);
+  backdrop-filter: blur(var(--backdrop-blur));
+}
+
+html,
+body {
+  width: 100dvw;
+  height: 100dvh;
+  min-height: 100dvh;
+  min-width: 100dvw;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family), sans-serif;
+}
+
+body {
+  background-color: #ededed;
+}
+
+.lunae-version-block {
+  rotate: 90deg;
+  background-color: #fff;
+  transform-origin: left bottom;
+  height: 2rem;
+  width: 80dvh;
+  position: absolute;
+  left: 2rem;
+  bottom: calc(100% - 1.5rem)
+}
+
+.lunae-version-info {
+  font-family: var(--font-family), sans-serif;
+  font-weight: 700;
+  position: absolute;
+  left: 0.75rem;
+  bottom: .25rem;
+  font-size: xxx-large;
+}
+
+.lunae-rimu-info {
+  font-family: var(--font-family), sans-serif;
+  position: absolute;
+  right: 0.75rem;
+  top: 0.75rem;
+}
+
+
+.lunae-fsyslog {
+  background-color: #fff;
+  position: absolute;
+  bottom: 1.5rem;
+  left: 0.75rem;
+  padding: 0.25rem;
+  font-family: var(--font-family), sans-serif;
+  font-size: xx-small;
+}
+
+.silkscreen {
+  --font-family: "Silkscreen";
+}
+
+.silkscreen-regular {
+  font-family: "Silkscreen", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.silkscreen-bold {
+  font-family: "Silkscreen", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.bootloader {
+  background: rgba(0, 0, 0, 1);
+  z-index: 999999999;
+}
+
+.loader-info {
+  position: absolute;
+  transition: all;
+  bottom: 1rem;
+  left: 0rem;
+  color: var(--primary-light);
+  font-size: xx-large;
+}
+
+.progress {
+  background-color: black;
+}
+
+.progress > div {
+  width: 0%;
+  background-color: var(--primary-light);
+  height: 3px;
+  transition: all;
+}
+
+.syslog-entry {
+  line-height: 1;
+  font-size: 0.75rem;
+}
+
+.boot-syslog {
+  position: absolute;
+  left: 0rem;
+  color: var(--primary-light);
+  transition: all;
+  bottom: 4rem;
+}
+
+@keyframes bootloaderDissolveScan {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotateY(0deg);
+    filter: blur(0px) brightness(1);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1.02) rotateY(5deg);
+    filter: blur(0px) brightness(1.1);
+  }
+
+  60% {
+    opacity: 0.8;
+    transform: scale(1.01) rotateY(-3deg);
+    filter: blur(2px) brightness(0.95);
+  }
+
+  85% {
+    opacity: 0.3;
+    transform: scale(0.98) rotateY(2deg);
+    filter: blur(8px) brightness(0.8);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.95) rotateY(0deg);
+    filter: blur(15px) brightness(0.5);
+  }
+}
+
+.bootloader.dissolving {
+  animation: bootloaderDissolveScan 0.8s ease-in-out forwards;
+}

@@ -1,0 +1,13 @@
+@media (prefers-color-scheme: light) {
+  :root {
+    --primary: #B3EBF2;
+  }
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}

@@ -1,0 +1,67 @@
+.w-20dv {
+  --width: 20dvw;
+  width: var(--width);
+}
+
+.w-80dv {
+  --width: 80dvw;
+  width: var(--width);
+}
+
+.w-90dv {
+  --width: 90dvw;
+  width: var(--width);
+}
+
+.w-10dv {
+  --width: 10dvw;
+  width: var(--width);
+}
+
+.w-fixed {
+  min-width: var(--width);
+  max-width: var(--width);
+}
+
+.h-100 {
+  height: 100%;
+}
+
+.h-100dv {
+  --height: 100dvh;
+  height: var(--height);
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.w-100dv {
+  --width: 100dvw;
+  width: var(--width);
+}
+
+.h-fixed {
+  min-height: var(--height);
+  max-height: var(--height);
+}
+
+.d-flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.bottom {
+  bottom: 0rem;
+}
+
+.left {
+  left: 0rem;
+}

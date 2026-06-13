@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUNAERI System</title>
+  <link rel="stylesheet" href="css/colors.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/utilities.css">
+  <script type="module" src="js/main.mjs" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Chewy&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap"
+    rel="stylesheet">
+
+</head>
+
+<body>
+  <div class="bootloader w-fixed w-100dv h-100dv h-fixed absolute">
+    <div class="bottom left absolute">
+      <div class="boot-syslog"></div>
+      <div class="loader-info">0%</div>
+      <div class="progress w-100 w-fixed">
+        <div></div>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex flex-wrap">
+    <div class="w-10dv w-fixed h-100dv h-fixed">
+      <div class="lunae-version-block">
+        <div class="lunae-version-info">LOADING</div>
+        <div class="lunae-rimu-info">LOADING</div>
+      </div>
+      <div class="lunae-fsyslog">
+        <div>v0.0.1</div>
+        <div>LUNAERI[System]</div>
+        <div class="text-primary">DESKTOP MODE</div>
+      </div>
+    </div>
+    <div class="w-90dv w-fixed h-100dv h-fixed endfield">
+    </div>
+  </div>
+</body>
+
+</html>
