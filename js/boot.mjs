@@ -3,10 +3,13 @@ class SystemLogger {
   /**
    * System Logger
    * @param {string} name
+   * @param {number|string} level_limit
    */
-  constructor(name) {
+  constructor(name, level_limit = -1) {
     this.name = name;
     this.logs = [];
+    this.levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    this.level_limit = typeof level_limit == 'string' ? this.levels.indexOf(level_limit) : level_limit
   }
 
   /**
@@ -15,6 +18,8 @@ class SystemLogger {
    * @param {string} message
    */
   log(level, message) {
+    const level_index = this.levels.indexOf(level.toUpperCase())
+    if (level_index < this.level_limit) return;
     const timestamp = new Date().toISOString();
     const entry = { timestamp, level, message, module: this.name };
     this.logs.push(entry);
@@ -62,19 +67,33 @@ export const systemLog = new SystemLogger("System");
 
 // Boot Sequence Manager
 class BootSequence {
-  constructor() {
+
+  /**
+   * Boot sequences
+   * @param {number} sequence_limit The amount of shadow jobs before reaching 100%
+   * @param {string|number} [level_limit="INFO"]
+   */
+  constructor(sequence_limit, level_limit = "INFO") {
+    this.currentStep = 0;
+    this.maxStep = sequence_limit
     this.width = 0;
     this.bootInterval = null;
     this.bootloaderPg = null;
     this.bootloaderInfo = null;
     this.diff = 0;
     this.diffOffset = 0;
-    this.logger = new SystemLogger("BootSequence");
+    this.logger = new SystemLogger("BootSequence", level_limit);
   }
 
-  initialize() {
+  /**
+   * Initialize boot sequence, when sequence limit is not passed, will use already instantiated value.
+   * @param {number?} sequence_limit
+   * @returns
+   */
+  initialize(sequence_limit) {
     this.bootloaderPg = document.querySelector(".progress > div");
     this.bootloaderInfo = document.querySelector(".loader-info");
+    this.maxStep = !sequence_limit ? this.sequence_limit : sequence_limit
 
     if (!this.bootloaderPg || !this.bootloaderInfo) {
       this.logger.error("Bootloader UI elements not found");
@@ -82,6 +101,7 @@ class BootSequence {
     }
 
     this.logger.info("Boot sequence initialized");
+    this.logger.info(`Running boot scripts (${this.maxStep} in total)`)
     return true;
   }
 
@@ -89,19 +109,18 @@ class BootSequence {
     this.logger.info("Starting boot sequence");
     this.width = 0;
 
-    this.bootInterval = setInterval(() => {
-      this.updateProgress();
-    }, 10);
+    // this.bootInterval = setInterval(() => {
+    //   this.updateProgress();
+    // }, 10);
   }
 
-  updateProgress() {
+  draw() {
     const progressRatio = this.width / 100;
-
     // Update UI
-    this.bootloaderInfo.textContent = `${this.width}%`;
+    this.bootloaderInfo.textContent = `${(this.width * 100).toFixed(2)}%`;
     // Max size must be below updated text content.
     const maxSize = document.documentElement.clientWidth - this.bootloaderInfo.offsetWidth;
-    this.bootloaderPg.style.width = `${this.width}%`;
+    this.bootloaderPg.style.width = `${this.width * 100}%`;
 
     // Handle positioning changes
     if (maxSize !== this.diff) {
@@ -111,16 +130,20 @@ class BootSequence {
     }
 
     this.bootloaderInfo.style.left = `${progressRatio * maxSize}px`;
+  }
 
-    if (this.width >= 100) {
+  updateProgress() {
+    this.currentStep += 1;
+    this.width = this.currentStep / this.maxStep
+    this.draw()
+    if (this.currentStep >= this.maxStep) {
       this.complete();
-    } else {
-      this.width += 1;
+      return
     }
   }
 
   complete() {
-    clearInterval(this.bootInterval);
+    // clearInterval(this.bootInterval);
     this.logger.info("Boot sequence completed");
 
     const bootloader = document.querySelector(".bootloader");
