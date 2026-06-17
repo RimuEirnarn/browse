@@ -1,4 +1,4 @@
-import { systemLog } from "./boot.mjs";
+import { bootSequence, systemLog } from "./boot.mjs";
 import { prompt } from "./modals.mjs";
 import { closePalette, open_callbacks } from "./palette.mjs";
 import { toast } from "./toasts.mjs";
@@ -30,7 +30,7 @@ const ruler = document.createElement('span')
 ruler.style.cssText = `
   position: absolute;
   visibility: hidden;
-  display: none;
+  opacity: 0;
   white-space: pre;
   font-family: var(--font-mono);
   font-size: 15px;
@@ -67,7 +67,7 @@ const res = []
  * @param {() => null} callback
  */
 export function register(name, desc, callback) {
-  systemLog.info(`Registering ${name}`)
+  systemLog.info(`Registering command ${name}`)
   commands.set(name, {desc, callback})
 }
 
@@ -318,6 +318,9 @@ function update_ghost(val, results) {
 
   ruler.textContent = val
   const typedWidth = ruler.getBoundingClientRect().width
+  if (ruler.textContent) {
+    document.documentElement.style.overflow = 'hidden'
+  }
 
   ghost.style.left = `${typedWidth}px`
   ghost.textContent = suggestion.slice(val.length)
@@ -458,6 +461,7 @@ export function initialize_commands() {
     element.addEventListener("click", () => set_prefix(command_id))
   })
   systemLog.info("Initialized commands")
+  bootSequence.updateProgress()
 }
 
 

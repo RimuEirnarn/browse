@@ -3,12 +3,14 @@ import { bootSequence, systemLog } from "./boot.mjs"
 import { compute } from "./moodnr.mjs"
 import { init_palette } from "./palette.mjs"
 import { initialize_commands } from "./commands.mjs"
-import { mountWidgets } from "./widget.mjs"
+import { init_user_widgets, initlaize_widgets } from "./widget.mjs"
 import "./commands/registries.mjs"
+import { initialize_theme } from "./theme.mjs"
+import { init_user_commands } from "./commands/registries.mjs"
 
 /** @typedef {import("./moodnr.mjs").MNData} MNData */
 
-const max_step = 3
+const max_step = 9;
 const version = "v0.0.1"
 document.addEventListener("DOMContentLoaded", () => {
   systemLog.info("System loaded");
@@ -51,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // document.querySelector(".lunae-rimu-info").innerHTML = `<span class="text-aws">${aws}</span>/<span class="text-hpy">${hpy}</span>/<span class="text-nr">${nr}</span>/<span class="text-bd">${bd}</span>/<span class="text-awf">${awf}</span>`;
     document.querySelector(".lunae-rimu-info").textContent = `${aws}/${hpy}/${nr}/${bd}/${awf}`
     const hp = document.querySelector(".system-runtime")
-    const score = compute({aws, hpy, nr, bd, awf})
+    const score = compute({ aws, hpy, nr, bd, awf })
     let hp_class;
     if (score.score >= 100) hp_class = "text-aws"
     else if (score.score >= 90) hp_class = "text-hpy"
@@ -67,13 +69,14 @@ document.addEventListener("DOMContentLoaded", () => {
     systemLog.error(`Failed to load system status: ${err.message}`);
   });
 
-  (() => {
-    init_palette()
-    initialize_commands()
-    mountWidgets()
-    bootSequence.updateProgress()
-    systemLog.info("Initialized core modules")
-  })()
+  initialize_theme()
+  init_palette()
+  init_user_widgets()
+  init_user_commands()
+  initialize_commands()
+  initlaize_widgets()
+  systemLog.info("Initialized core modules")
+  bootSequence.updateProgress()
 
   // setTimeout(() => bootSequence.updateProgress(), 1000)
   // setTimeout(() => bootSequence.updateProgress(), 1500)

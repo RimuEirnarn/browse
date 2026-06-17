@@ -1,9 +1,10 @@
 @import "https://www.nerdfonts.com/assets/css/webfont.css";
+@import "./theme/main.css";
+@import "./theme/light.css";
+@import "./theme/dark.css";
 
 :root {
   --font-family: "Press Start 2P";
-  --primary: #2E6C7B;
-  --primary-light: #B3EBF2;
 }
 
 .endfield {
@@ -22,15 +23,16 @@ body {
   margin: 0;
   padding: 0;
   font-family: var(--font-family), sans-serif;
+  color: var(--text);
 }
 
 body {
-  background-color: #ededed;
+  background-color: rgb(var(--background));
 }
 
 .lunae-version-block {
   rotate: 90deg;
-  background-color: #fff;
+  background-color: rgb(var(--alternate-bg));
   transform-origin: left bottom;
   height: 2rem;
   width: 80dvh;
@@ -57,7 +59,7 @@ body {
 
 
 .lunae-fsyslog {
-  background-color: #fff;
+  background-color: rgb(var(--alternate-bg));
   position: absolute;
   bottom: 1.5rem;
   left: 0.75rem;

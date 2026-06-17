@@ -1,0 +1,13 @@
+[data-theme="dark"] {
+  --primary: #B3EBF2;
+  --background: 57, 57, 57;
+  --alternate-bg: 11, 18, 21;
+  --text: #fafafa;
+
+  /* Status Colors */
+  --info: #6ab0f5;
+  --ok: #4CAF50;
+  --error: #ff6b6b;
+  --warn: #ffd93d;
+  --critical: #ff4444;
+}

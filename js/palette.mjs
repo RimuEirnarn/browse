@@ -1,4 +1,4 @@
-import { systemLog } from "./boot.mjs"
+import { bootSequence, systemLog } from "./boot.mjs"
 
 /** @type {HTMLDivElement} */
 const palette = document.querySelector("#palette")
@@ -32,7 +32,6 @@ export function closePalette() {
 }
 
 export function init_palette() {
-  systemLog.info("Initialized palette")
   document.addEventListener('keydown', (e) => {
     if (e.key === 'k' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault() // stops browser's default Ctrl+K behavior (focus address bar)
@@ -42,4 +41,6 @@ export function init_palette() {
       closePalette()
     }
   })
+  systemLog.info("Initialized palette")
+  bootSequence.updateProgress()
 }

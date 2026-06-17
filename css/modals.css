@@ -2,6 +2,7 @@
   position: fixed;
   inset: 0;
   background: rgba(4, 8, 12, 0.7);
+  /* background: rgba(237, 237, 237, 0.98); */
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -13,8 +14,10 @@
 .modal-overlay.modal-visible { opacity: 1; }
 
 .modal-box {
-  background: rgba(8, 14, 20, 0.95);
-  border: 0.5px solid rgba(0, 200, 160, 0.3);
+  /* background: rgba(8, 14, 20, 0.95); */
+  /* background: rgba(237, 237, 237, 0.98); */
+  background: rgba(var(--background), 0.98);
+  border: 0.5px solid color-mix(in srgb, var(--primary) 30%, transparent);
   border-radius: 8px;
   padding: 24px;
   width: 380px;
@@ -27,7 +30,7 @@
 
 .modal-title {
   font-size: 13px;
-  color: #00e8b0;
+  color: var(--primary);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -40,33 +43,37 @@
 
 .modal-label {
   font-size: 11px;
-  color: rgba(0, 200, 160, 0.5);
+  /* color: rgba(0, 200, 160, 0.5); */
+  color: var(--primary);
   letter-spacing: 0.06em;
 }
 .modal-label[data-required]::after {
   content: ' *';
-  color: #e88080;
+  color: var(--error);
 }
 
 .modal-input {
-  background: rgba(0, 200, 160, 0.05);
-  border: 0.5px solid rgba(0, 200, 160, 0.25);
+  /* background: rgba(0, 200, 160, 0.05); */
+  /* background: rgba(237, 237, 237, 0.98); */
+  background: rgba(var(--background), 0.98);
+  border: 0.5px solid color-mix(in srgb, var(--primary) 25%, transparent);
   border-radius: 5px;
   padding: 8px 10px;
   font-family: var(--font-mono);
   font-size: 13px;
-  color: #d0e8e0;
+  /* color: #9aaca6; */
+  color: var(--primary);
   outline: none;
   transition: border-color 0.15s;
 }
-.modal-input:focus { border-color: rgba(0, 200, 160, 0.6); }
-.modal-input.modal-input-error { border-color: rgba(200, 80, 80, 0.6); }
+.modal-input:focus { border-color: color-mix(in srgb, var(--primary) 60%, transparent); }
+.modal-input.modal-input-error { border-color: color-mix(in srgb, var(--error) 60%, transparent); }
 
 .modal-textarea { resize: vertical; min-height: 80px; }
 
 .modal-error {
   font-size: 10px;
-  color: #e88080;
+  color: var(--error);
   min-height: 14px;
 }
 
@@ -84,8 +91,10 @@
 .modal-toggle-slider {
   position: absolute;
   inset: 0;
-  background: rgba(0,200,160,0.1);
-  border: 0.5px solid rgba(0,200,160,0.25);
+  /* background: rgba(0,200,160,0.1); */
+  /* background: rgba(237, 237, 237, 0.98); */
+  background: rgba(var(--background), 0.98);
+  border: 0.5px solid color-mix(in srgb, var(--primary) 25%, transparent);
   border-radius: 20px;
   cursor: pointer;
   transition: background 0.2s;
@@ -95,14 +104,15 @@
   position: absolute;
   width: 14px; height: 14px;
   left: 2px; top: 2px;
-  background: rgba(0,200,160,0.4);
+  /* background: rgba(0,200,160,0.4); */
+  background: rgba(var(--background), 0.98);
   border-radius: 50%;
   transition: transform 0.2s, background 0.2s;
 }
-.modal-toggle:checked + .modal-toggle-slider { background: rgba(0,200,160,0.15); }
+.modal-toggle:checked + .modal-toggle-slider { background: color-mix(in srgb, var(--primary) 15%, transparent); }
 .modal-toggle:checked + .modal-toggle-slider::after {
   transform: translateX(16px);
-  background: #00e8b0;
+  background: var(--ok);
 }
 
 /* actions */
@@ -124,13 +134,14 @@
 }
 .modal-btn-cancel {
   background: transparent;
-  border-color: rgba(0,200,160,0.2);
-  color: rgba(0,200,160,0.5);
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  color: var(--primary);
+  /* co */
 }
-.modal-btn-cancel:hover { background: rgba(0,200,160,0.05); }
+.modal-btn-cancel:hover { background: color-mix(in srgb, var(--primary) 5%, transparent); }
 .modal-btn-submit {
-  background: rgba(0,200,160,0.1);
-  border-color: rgba(0,200,160,0.4);
-  color: #00e8b0;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+  color: var(--primary);
 }
-.modal-btn-submit:hover { background: rgba(0,200,160,0.18); }
+.modal-btn-submit:hover { background: color-mix(in srgb, var(--primary) 18%, transparent); }

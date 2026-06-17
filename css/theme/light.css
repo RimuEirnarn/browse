@@ -1,0 +1,13 @@
+[data-theme="light"] {
+  --primary: #2E6C7B;
+  --background: 237, 237, 237;
+  --alternate-bg: 255, 255, 255;
+  --text: #000;
+
+  /* Status Colors */
+  --info: #6ab0f5;
+  --ok: #4CAF50;
+  --error: #e88080;
+  --warn: #e8b85a;
+  --critical: #c62828;
+}
