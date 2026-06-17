@@ -181,3 +181,7 @@ body {
   height: 3px;
   flex: 0 0 auto;
 }
+
+.hidden {
+  display: none;
+}

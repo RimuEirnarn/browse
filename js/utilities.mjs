@@ -1,3 +1,5 @@
+const MOTD_URL = "https://rimueirnarn.pythonanywhere.com/api/motd"
+
 /**
  * Request a file
  * @param {string} url
@@ -60,4 +62,8 @@ export function sanitize(str) {
   if (str === undefined || str === null) return "null";
   if (typeof str === "string") return str.replace(reg, (match) => map[match]);
   else return str.toString().replace(reg, (match) => map[match]);
+}
+
+export async function fetch_motd() {
+  return request_json(MOTD_URL)
 }

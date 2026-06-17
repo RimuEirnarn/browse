@@ -1,5 +1,7 @@
 import { systemLog } from "./boot.mjs";
+import { prompt } from "./modals.mjs";
 import { closePalette, open_callbacks } from "./palette.mjs";
+import { toast } from "./toasts.mjs";
 import { sanitize } from "./utilities.mjs"
 
 const results_element = document.getElementById("results")
@@ -9,20 +11,26 @@ const section_label = document.getElementById('section_label');
 const prefix_tips = document.getElementById('prefix_tips');
 const status = document.getElementById('palette_status');
 const ghost = document.getElementById('ghost')
+const no_update_prefixes = [">", "?"]
 let active_index = 0;
 const debug = true;
 
-/** @type {Object.<string, () => void>} */
-const commands = {
-  "obsidian": () => {
-    window.open("obsidian://open?vault=Remembrance")
-  }
-}
+/** @typedef {import("./modals.mjs").ModalSchema} ModalSchema */
+/** @typedef {import("./modals.mjs").FieldSchema} FieldSchema */
 
+/**
+ * @typedef CommandSchema
+ * @prop {string} desc
+ * @prop {() => null} callback
+ */
+
+/** @type {Map.<string, CommandSchema>} */
+const commands = new Map()
 const ruler = document.createElement('span')
 ruler.style.cssText = `
   position: absolute;
   visibility: hidden;
+  display: none;
   white-space: pre;
   font-family: var(--font-mono);
   font-size: 15px;
@@ -42,14 +50,26 @@ document.body.appendChild(ruler)
  */
 
 /** @type {ResultQuery[]} */
-const demo_res = [
-  { icon: 'nf-cod-globe', type: 'url', title: 'github.com/NekoRisya', sub: 'https://github.com/NekoRisya', badge: 'recent', badge_class: 'badge-hist', action: "https://github.com/NekoRisya" },
-  { icon: 'nf-cod-terminal', type: 'cmd', title: 'open system settings', sub: '/settings · system configuration', badge: 'cmd', badge_class: 'badge-cmd', action: "settings" },
-  { icon: 'nf-cod-bookmark', type: 'bookmark', title: 'Obsidian vault notes', sub: 'obsidian://open?vault=main', badge: 'bookmark', badge_class: 'badge-url', action: 'command://obsidian' },
-];
+// const demo_res = [
+//   { icon: 'nf-cod-globe', type: 'url', title: 'github.com/NekoRisya', sub: 'https://github.com/NekoRisya', badge: 'recent', badge_class: 'badge-hist', action: "https://github.com/NekoRisya" },
+//   { icon: 'nf-cod-terminal', type: 'cmd', title: 'open system settings', sub: '/settings · system configuration', badge: 'cmd', badge_class: 'badge-cmd', action: "settings" },
+//   { icon: 'nf-cod-bookmark', type: 'bookmark', title: 'Obsidian vault notes', sub: 'obsidian://open?vault=main', badge: 'bookmark', badge_class: 'badge-url', action: 'command://obsidian' },
+// ];
+const demo_res = []
 
 /** @type {ResultQuery[]} */
 const res = []
+
+/**
+ * Register a command
+ * @param {string} name
+ * @param {string} desc
+ * @param {() => null} callback
+ */
+export function register(name, desc, callback) {
+  systemLog.info(`Registering ${name}`)
+  commands.set(name, {desc, callback})
+}
 
 /**
  * Push result with deduplication
@@ -58,16 +78,15 @@ const res = []
  * @param {string} [query=''] - The query/display value
  */
 function push_result(type, action, query = '') {
-  // Determine sub property based on type
   let sub = '';
   switch (type) {
     case 'url':
-      sub = action; // For URLs, sub is the URL itself
+      sub = action;
       break;
     case 'search':
     case 'ai':
     case 'cmd':
-      sub = query; // For these types, sub is the query
+      sub = query;
       break;
     default:
       sub = query;
@@ -106,6 +125,8 @@ function mode_for(val) {
   if (val.startsWith('/')) return 'command';
   if (val.startsWith('@')) return 'bookmark';
   if (val.startsWith('#')) return 'history';
+  if (val.startsWith("?")) return 'ai';
+  if (val.startsWith(">")) return 'eval';
   return 'omni';
 }
 
@@ -202,12 +223,17 @@ function update(value, results) {
   const query = value.replace(/^[\/\>\@\?\#]/, '').toLowerCase();
   let filtered = get_filtered_result(query, mode, results)
 
-  if (!value) filtered = res.slice(0, 4);
+  if (!value) filtered = results.slice(0, 4);
 
   status.textContent = filtered.length + " result" + (filtered.length !== 1 ? 's' : '');
   if (active_index == filtered.length) active_index = 0;
 
   render(filtered)
+}
+
+function clear_buffer() {
+  update("", [])
+  render([])
 }
 
 /**
@@ -231,7 +257,7 @@ function get_filtered_result(query, mode, results) {
  * @param {string[]} vals
  * @returns
  */
-function getSharedPrefix(vals) {
+function get_shared_prefix(vals) {
   if (!vals.length) return ''
   let prefix = vals[0]
   for (const v of vals.slice(1)) {
@@ -263,13 +289,10 @@ function get_suggestion(val, results) {
 
   if (!matches.length) return null
 
-  // unambiguous — full completion
   if (matches.length === 1) return prefix + matches[0].title
 
-  // ambiguous — complete only up to shared prefix
-  const shared = getSharedPrefix(matches.map(r => r.title.toLowerCase()))
+  const shared = get_shared_prefix(matches.map(r => r.title.toLowerCase()))
 
-  // only suggest if shared prefix is longer than what's already typed
   if (shared.length <= query.length) return null
 
   return prefix + shared
@@ -282,7 +305,8 @@ function get_suggestion(val, results) {
 function set_prefix(value) {
   input_element.value = value;
   input_element.focus();
-  update(value, res);
+  if (no_update_prefixes.includes(value)) update("", [])
+  else update(value, res);
 }
 
 function update_ghost(val, results) {
@@ -292,13 +316,21 @@ function update_ghost(val, results) {
     return
   }
 
-  // measure how wide the typed portion is
   ruler.textContent = val
   const typedWidth = ruler.getBoundingClientRect().width
 
-  // position ghost so its start aligns with end of typed text
   ghost.style.left = `${typedWidth}px`
-  ghost.textContent = suggestion.slice(val.length) // only the untyped tail
+  ghost.textContent = suggestion.slice(val.length)
+}
+
+function run_command(command, identifier = "command://") {
+  if (command.startsWith(identifier)) {
+    const action = command.replace("/", "")
+    console.log(`Running ${action}`)
+    commands.get(action)?.callback()
+    closePalette()
+    return;
+  }
 }
 
 /**
@@ -306,13 +338,7 @@ function update_ghost(val, results) {
  * @param {ResultQuery} item
  */
 function execute(item) {
-  if (item.action.startsWith('command://')) {
-    const action = item.action.replace("command://", "")
-    console.log(`Running ${action}`)
-    commands[action]?.()
-    closePalette()
-    return;
-  }
+  run_command(item.action)
   switch (item.type) {
     case 'url': {
       const url = item.action.startsWith('https://') || item.action.startsWith('http://') ? item.action : `https://${item.action}`;
@@ -321,7 +347,7 @@ function execute(item) {
     }
 
     case 'cmd':
-      commands[item.action]?.()
+      commands.get(item.action)?.callback()
       break
 
     case 'search':
@@ -331,47 +357,64 @@ function execute(item) {
     case 'ai':
       window.location.href = `https://claude.ai/new?q=${encodeURIComponent(item.action)}`
       break
+
+    case 'eval':
+      run_script(item.action)
+      break
   }
 
   closePalette()
 }
 
-function executeRawQuery(val) {
+function execute_raw_query(val) {
   if (val.startsWith('?')) {
     const query = val.slice(1).trim();
     push_result('ai', query, query);
     window.location.href = `https://claude.ai/new?q=${encodeURIComponent(query)}`
   } else if (val.startsWith('>')) {
-    runScript(val.slice(1).trim())
+    run_script(val.slice(1).trim())
+  } else if (val.startsWith("/")) {
+    run_command(val, '/')
   } else if (isURL(val) || val.startsWith("https://") || val.startsWith("http://")) {
     const url = val.startsWith('https://') || val.startsWith('http://') ? val : `https://${val}`;
     push_result('url', val);
     window.location.href = url;
   } else {
-    // default: web search
     push_result('search', val, val);
     window.location.href = `https://google.com/search?q=${encodeURIComponent(val)}`
   }
 }
 
-function runScript(raw) {
+function run_script(raw) {
   try {
-    const result = eval(raw) // fine on your own newtab, not in an extension
+    const result = eval(raw)
     console.log('[palette]', result)
+    toast(`[Command] ${result}`, { level: 'ok' })
   } catch (err) {
-    showError(err.message)
+    toast(err.message, { level: 'error' })
   }
 }
 
 function isURL(val) {
-  return /^[\w-]+\.\w{2,}/.test(val) // rough: "github.com/..." style
+  return /^[\w-]+\.\w{2,}/.test(val)
 }
 
 export function initialize_commands() {
   load_results()
   open_callbacks.push(() => update("", res))
   if (res.length === 0) res.push(...demo_res)
+  const flat_res = res.map((result) => result.title)
+
+  for (const [name, command] of commands) {
+    if (flat_res.includes(name)) continue
+    res.push({ title: name, action: name, sub: command.desc, badge: 'cmd', badge_class: type_badges('cmd'), type: 'cmd', icon: type_icons('cmd') })
+  }
+
   input_element.addEventListener("input", element => {
+    if (element.target.value.startsWith(">")) {
+      clear_buffer()
+      return;
+    };
     active_index = 0
     update_ghost(element.target.value, res)
     update(element.target.value, res)
@@ -383,18 +426,29 @@ export function initialize_commands() {
       const prefix = input_element.value.at(0) || ""
       const active = get_filtered_result(input_element.value.slice(1), mode_for(prefix), res)[active_index]
       if (active) execute(active)
-      else executeRawQuery(input_element.value) // fallback for freeform input
+      else execute_raw_query(input_element.value)
     }
-    if (element.key === 'ArrowDown') { element.preventDefault(); active_index = Math.min(active_index + 1, items.length - 1); update(input_element.value, res); }
-    if (element.key === 'ArrowUp') { element.preventDefault(); active_index = Math.max(active_index - 1, 0); update(input_element.value, res); }
+    if (element.key === 'ArrowDown') {
+      element.preventDefault();
+      if (input_element.value.startsWith(">")) { clear_buffer(); return; }
+      active_index = Math.min(active_index + 1, items.length - 1);
+      update(input_element.value, res);
+    }
+    if (element.key === 'ArrowUp') {
+      element.preventDefault();
+      if (input_element.value.startsWith(">")) { clear_buffer(); return; }
+      active_index = Math.max(active_index - 1, 0);
+      update(input_element.value, res);
+    }
     if (element.key === 'Tab') {
-      element.preventDefault() // stops focus jumping elsewhere
+      element.preventDefault()
+      if (input_element.value.startsWith(">")) { clear_buffer(); return; }
 
       const suggestion = get_suggestion(input_element.value, res)
       if (suggestion) {
         input_element.value = suggestion
         ghost.textContent = ''
-        update(suggestion, res) // re-filter with completed value
+        update(suggestion, res)
       }
     }
   });
