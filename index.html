@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/colors.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/utilities.css">
+  <link rel="stylesheet" href="css/commands.css">
   <script type="module" src="js/main.mjs" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,16 +33,96 @@
       <div class="lunae-version-block">
         <div class="lunae-version-info">LOADING</div>
         <div class="lunae-rimu-info">LOADING</div>
+        <div class="sp w-100">
+          <div class="aws"></div>
+          <div class="hpy"></div>
+          <div class="nr"></div>
+          <div class="bd"></div>
+          <div class="awf"></div>
+        </div>
       </div>
       <div class="lunae-fsyslog">
-        <div>v0.0.1</div>
+        <div class="version"></div>
         <div>LUNAERI[System]</div>
         <div class="text-primary">DESKTOP MODE</div>
+        <div class="system-runtime"></div>
       </div>
     </div>
     <div class="w-90dv w-fixed h-100dv h-fixed endfield">
+      <div class="overlay" id="palette">
+        <div class="hud-corner"><span class="version"></span> &nbsp; <span>LUNAERI[System]</span> &nbsp; DESKTOP MODE
+        </div>
+
+        <div class="search-wrap" id="searchWrap">
+          <i class="nf nf-oct-terminal" aria-hidden="true"></i>
+          <div class="input-ghost-wrap">
+            <span id="ghost" class="ghost-text" aria-hidden="true"></span>
+            <input type="text" id="palette_input" placeholder="search, navigate, or run a command..." autocomplete="off"
+              spellcheck="false" />
+          </div>
+          <span class="mode-tag" id="mode">omni</span>
+        </div>
+
+        <div class="hint-row">
+          <span><kbd>↑↓</kbd> navigate</span>
+          <span><kbd>enter</kbd> open</span>
+          <span><kbd>tab</kbd> complete</span>
+          <span><kbd>esc</kbd> dismiss</span>
+          <span><kbd>ctrl+k</kbd> open palette</span>
+        </div>
+
+        <div class="section-label" id="section_label">quick prefixes</div>
+        <div class="prefix-tip" id="prefix_tips">
+          <span class="prefix-chip" data-cid="/"><b>/</b> command</span>
+          <span class="prefix-chip" data-cid="@"><b>@</b> bookmark</span>
+          <span class="prefix-chip" data-cid="#"><b>#</b> history</span>
+        </div>
+
+        <div class="results" id="results">
+          <!-- <div class="result-item active">
+            <div class="result-icon url"><i class="nf nf-cod-globe" aria-hidden="true"></i></div>
+            <div class="result-text">
+              <div class="result-title">github.com/NekoRisya</div>
+              <div class="result-sub">https://github.com/NekoRisya</div>
+            </div>
+            <span class="result-badge badge-hist">recent</span>
+          </div>
+          <div class="result-item">
+            <div class="result-icon url"><i class="nf nf-cod-globe" aria-hidden="true"></i></div>
+            <div class="result-text">
+              <div class="result-title">Honkai: Star Rail — HoYoLAB</div>
+              <div class="result-sub">hoyolab.com/honkai</div>
+            </div>
+            <span class="result-badge badge-hist">recent</span>
+          </div>
+          <div class="result-item">
+            <div class="result-icon cmd"><i class="nf nf-cod-settings_gear" aria-hidden="true"></i></div>
+            <div class="result-text">
+              <div class="result-title">open system settings</div>
+              <div class="result-sub">/settings · system configuration</div>
+            </div>
+            <span class="result-badge badge-cmd">cmd</span>
+          </div>
+          <div class="result-item">
+            <div class="result-icon cmd"><i class="nf nf-cod-code" aria-hidden="true"></i></div>
+            <div class="result-text">
+              <div class="result-title">open netmesh dashboard</div>
+              <div class="result-sub">/netmesh · local node monitor</div>
+            </div>
+            <span class="result-badge badge-cmd">cmd</span>
+          </div>
+        </div> -->
+
+          <div class="divider"></div>
+
+          <div class="bottom-bar">
+            <span class="status" id="palette_status"></span>
+            <div class="actions">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 </body>
 
 </html>
