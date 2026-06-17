@@ -11,3 +11,57 @@
 .bg-primary {
   background-color: var(--primary);
 }
+
+/* Status Colors */
+:root {
+  --status-hpy: #4CAF50;    /* Happy - Green */
+  --status-aws: #29B6F6;    /* Awesome - Blue */
+  --status-bd: #EF5350;     /* Bad - Red */
+  --status-awf: #C62828;    /* Awful - Dark Red */
+  --status-nr: #9E9E9E;     /* No Response - Gray */
+}
+
+/* HPY (Happy) */
+.text-hpy {
+  color: var(--status-hpy);
+}
+
+.bg-hpy, .hpy {
+  background-color: var(--status-hpy);
+}
+
+/* AWS (Awesome) */
+.text-aws {
+  color: var(--status-aws);
+}
+
+.bg-aws, .aws {
+  background-color: var(--status-aws);
+}
+
+/* BD (Bad) */
+.text-bd {
+  color: var(--status-bd);
+}
+
+.bg-bd, .bd {
+  background-color: var(--status-bd);
+}
+
+/* AWF (Awful) */
+.text-awf {
+  color: var(--status-awf);
+}
+
+.bg-awf, .awf {
+  background-color: var(--status-awf);
+}
+
+/* NR (No Response) */
+.text-nr {
+  color: var(--status-nr);
+}
+
+.bg-nr, .nr {
+  background-color: var(--status-nr);
+}

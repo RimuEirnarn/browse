@@ -1,3 +1,5 @@
+@import "https://www.nerdfonts.com/assets/css/webfont.css";
+
 :root {
   --font-family: "Press Start 2P";
   --primary: #2E6C7B;
@@ -120,7 +122,7 @@ body {
   overflow: hidden;
 }
 
-@keyframes bootloaderDissolveScan {
+@keyframes dissolveAnim {
   0% {
     opacity: 1;
     transform: scale(1) rotateY(0deg);
@@ -152,6 +154,30 @@ body {
   }
 }
 
-.bootloader.dissolving {
-  animation: bootloaderDissolveScan 0.8s ease-in-out forwards;
+.dissolving {
+  animation: dissolveAnim 0.8s ease-in-out forwards;
+}
+
+.dissolving-fast {
+  animation: dissolveAnim 0.3s ease-in-out forwards;
+}
+
+.solving {
+  animation: dissolveAnim 0.3s ease-in-out forwards;
+  animation-direction: reverse;
+}
+
+.sp {
+  position: absolute;
+  height: 3px;
+  bottom: -1px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.sp div {
+  height: 3px;
+  flex: 0 0 auto;
 }

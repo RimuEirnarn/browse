@@ -25,3 +25,39 @@ export async function render_to(url, callback, otherwise) {
   .catch(otherwise)
   .then(callback)
 }
+
+/**
+ * Fetch current timestamp
+ * @returns {number}
+ */
+export function now() {
+  return Date.now()
+}
+
+/**
+ * Percentage of something
+ * @param {number} x
+ * @param {number} y
+ */
+export function p(x, y) {
+  return (x / y) * 100
+}
+
+/**
+ * Sanitize a string
+ * @param {string} str data
+ */
+export function sanitize(str) {
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#x27;",
+    "/": "&#x2F;",
+  };
+  const reg = /[&<>"'/]/gi;
+  if (str === undefined || str === null) return "null";
+  if (typeof str === "string") return str.replace(reg, (match) => map[match]);
+  else return str.toString().replace(reg, (match) => map[match]);
+}
