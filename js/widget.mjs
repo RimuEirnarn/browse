@@ -1,4 +1,4 @@
-import { systemLog } from "./boot.mjs"
+import { bootSequence, systemLog } from "./boot.mjs"
 import { fetch_motd, sanitize } from "./utilities.mjs"
 
 const widgetRegistry = new Map()
@@ -23,55 +23,59 @@ function registerWidget({ id, anchor, render, interval = null }) {
 // anchors: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 // disabled anchors: *-left
 
-registerWidget({
-  id: 'clock',
-  anchor: 'top-right',
-  interval: 1000,
-  render() {
-    const el = document.createElement('div')
-    el.className = 'widget'
-    el.textContent = new Date().toLocaleTimeString('en-GB')
-    return el
-  }
-})
+export function init_user_widgets() {
+  registerWidget({
+    id: 'clock',
+    anchor: 'top-right',
+    interval: 1000,
+    render() {
+      const el = document.createElement('div')
+      el.className = 'widget'
+      el.textContent = new Date().toLocaleTimeString('en-GB')
+      return el
+    }
+  })
 
-registerWidget({
-  id: 'date',
-  anchor: 'top-right',
-  render() {
-    const el = document.createElement('div')
-    el.className = 'widget'
-    el.textContent = new Date().toLocaleDateString('en-GB', {
-      weekday: 'long', day: 'numeric', month: 'long'
-    })
-    return el
-  }
-})
+  registerWidget({
+    id: 'date',
+    anchor: 'top-right',
+    render() {
+      const el = document.createElement('div')
+      el.className = 'widget'
+      el.textContent = new Date().toLocaleDateString('en-GB', {
+        weekday: 'long', day: 'numeric', month: 'long'
+      })
+      return el
+    }
+  })
 
-registerWidget({
-  id: "motd",
-  anchor: 'top-right',
-  render() {
-    const el = document.createElement('div')
-    el.className = `widget`
-    fetch_motd().then(value => el.textContent = value.data)
-    return el
-  }
-})
+  registerWidget({
+    id: "motd",
+    anchor: 'top-right',
+    render() {
+      const el = document.createElement('div')
+      el.className = `widget`
+      fetch_motd().then(value => el.textContent = value.data)
+      return el
+    }
+  })
 
-registerWidget({
-  id: "notes",
-  anchor: 'top-right',
-  render() {
-    const note = localStorage.getItem("notes")
-    const el = document.createElement('div')
-    el.className = `widget ${!note ? "hidden" : ""}`
-    el.textContent = sanitize(note)
-    return el
-  }
-})
+  registerWidget({
+    id: "notes",
+    anchor: 'top-right',
+    render() {
+      const note = localStorage.getItem("notes")
+      const el = document.createElement('div')
+      el.className = `widget ${!note ? "hidden" : ""}`
+      el.textContent = sanitize(note)
+      return el
+    }
+  })
 
-export function mountWidgets() {
+  bootSequence.updateProgress()
+}
+
+export function mount_widgets() {
   for (const [id, widget] of widgetRegistry) {
     const anchor = document.getElementById(`anchor-${widget.anchor}`)
     if (!anchor) continue
@@ -93,6 +97,12 @@ export function mountWidgets() {
       setInterval(refresh, widget.interval)
     }
   }
+}
+
+export function initlaize_widgets() {
+  mount_widgets()
+  systemLog.info("Widgets initialized")
+  bootSequence.updateProgress()
 }
 
 /**

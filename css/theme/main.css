@@ -1,0 +1,13 @@
+:root {
+  --primary: #2E6C7B;
+  --primary-light: #B3EBF2;
+  --background: 237, 237, 237;
+  --alternate-bg: 255, 255, 255;
+
+  /* Status Colors */
+  --info: #6ab0f5;
+  --ok: #4CAF50;
+  --error: #e88080;
+  --warn: #e8b85a;
+  --critical: #c62828;
+}

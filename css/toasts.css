@@ -26,7 +26,7 @@
   transform: translateX(0);
 }
 
-.toast-info  { background: rgba(237, 237, 237, 0.98); border: 0.5px solid rgba(0,200,160,0.3); color: var(--primary); }
-.toast-ok    { background: rgba(237, 237, 237, 0.98); border: 0.5px solid rgba(0,200,160,0.6); color: var(--primary); }
-.toast-error { background: rgba(237, 237, 237, 0.98); border: 0.5px solid rgba(200,80,80,0.5);  color: var(--primary); }
-.toast-warn  { background: rgba(237, 237, 237, 0.98); border: 0.5px solid rgba(232,184,90,0.4); color: var(--primary); }
+.toast-info  { background: rgba(var(--background), 0.98); border: 0.5px solid color-mix(in srgb, var(--info) 30%, transparent); color: var(--info); }
+.toast-ok    { background: rgba(var(--background), 0.98); border: 0.5px solid color-mix(in srgb, var(--ok) 60%, transparent); color: var(--ok); }
+.toast-error { background: rgba(var(--background), 0.98); border: 0.5px solid color-mix(in srgb, var(--error) 50%, transparent); color: var(--error); }
+.toast-warn  { background: rgba(var(--background), 0.98); border: 0.5px solid color-mix(in srgb, var(--warn) 40%, transparent); color: var(--warn); }

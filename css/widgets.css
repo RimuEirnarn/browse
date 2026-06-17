@@ -13,8 +13,8 @@
 .hud-anchor.bottom-right { bottom: 0; right: 0; align-items: flex-end; }
 
 .widget {
-  background: rgba(237, 237, 237, 0.98);
-  border: 0.5px solid rgba(0, 200, 160, 0.25);
+  background: rgba(var(--background), 0.98);
+  border: 0.5px solid color-mix(in srgb, var(--primary) 25%, transparent);
   border-radius: 6px;
   padding: 8px 12px;
   font-family: var(--font-mono);
