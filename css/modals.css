@@ -2,6 +2,7 @@
   position: fixed;
   inset: 0;
   background: rgba(4, 8, 12, 0.7);
+  /* background: rgba(237, 237, 237, 0.98); */
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -13,7 +14,8 @@
 .modal-overlay.modal-visible { opacity: 1; }
 
 .modal-box {
-  background: rgba(8, 14, 20, 0.95);
+  /* background: rgba(8, 14, 20, 0.95); */
+  background: rgba(237, 237, 237, 0.98);
   border: 0.5px solid rgba(0, 200, 160, 0.3);
   border-radius: 8px;
   padding: 24px;
@@ -27,7 +29,7 @@
 
 .modal-title {
   font-size: 13px;
-  color: #00e8b0;
+  color: #00a17c;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -40,7 +42,8 @@
 
 .modal-label {
   font-size: 11px;
-  color: rgba(0, 200, 160, 0.5);
+  /* color: rgba(0, 200, 160, 0.5); */
+  color: var(--primary);
   letter-spacing: 0.06em;
 }
 .modal-label[data-required]::after {
@@ -49,13 +52,15 @@
 }
 
 .modal-input {
-  background: rgba(0, 200, 160, 0.05);
+  /* background: rgba(0, 200, 160, 0.05); */
+  background: rgba(237, 237, 237, 0.98);
   border: 0.5px solid rgba(0, 200, 160, 0.25);
   border-radius: 5px;
   padding: 8px 10px;
   font-family: var(--font-mono);
   font-size: 13px;
-  color: #d0e8e0;
+  /* color: #9aaca6; */
+  color: var(--primary);
   outline: none;
   transition: border-color 0.15s;
 }
@@ -84,7 +89,8 @@
 .modal-toggle-slider {
   position: absolute;
   inset: 0;
-  background: rgba(0,200,160,0.1);
+  /* background: rgba(0,200,160,0.1); */
+  background: rgba(237, 237, 237, 0.98);
   border: 0.5px solid rgba(0,200,160,0.25);
   border-radius: 20px;
   cursor: pointer;
@@ -95,7 +101,8 @@
   position: absolute;
   width: 14px; height: 14px;
   left: 2px; top: 2px;
-  background: rgba(0,200,160,0.4);
+  /* background: rgba(0,200,160,0.4); */
+  background: rgba(237, 237, 237, 0.98);
   border-radius: 50%;
   transition: transform 0.2s, background 0.2s;
 }
@@ -126,11 +133,12 @@
   background: transparent;
   border-color: rgba(0,200,160,0.2);
   color: rgba(0,200,160,0.5);
+  /* co */
 }
 .modal-btn-cancel:hover { background: rgba(0,200,160,0.05); }
 .modal-btn-submit {
   background: rgba(0,200,160,0.1);
   border-color: rgba(0,200,160,0.4);
-  color: #00e8b0;
+  color: #00916f;
 }
 .modal-btn-submit:hover { background: rgba(0,200,160,0.18); }

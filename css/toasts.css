@@ -26,7 +26,7 @@
   transform: translateX(0);
 }
 
-.toast-info  { background: rgba(8,14,20,0.85); border: 0.5px solid rgba(0,200,160,0.3); color: #b8c8c0; }
-.toast-ok    { background: rgba(8,14,20,0.85); border: 0.5px solid rgba(0,200,160,0.6); color: #00e8b0; }
-.toast-error { background: rgba(8,14,20,0.85); border: 0.5px solid rgba(200,80,80,0.5);  color: #e88080; }
-.toast-warn  { background: rgba(8,14,20,0.85); border: 0.5px solid rgba(232,184,90,0.4); color: #e8b85a; }
+.toast-info  { background: rgba(237, 237, 237, 0.98); border: 0.5px solid rgba(0,200,160,0.3); color: var(--primary); }
+.toast-ok    { background: rgba(237, 237, 237, 0.98); border: 0.5px solid rgba(0,200,160,0.6); color: var(--primary); }
+.toast-error { background: rgba(237, 237, 237, 0.98); border: 0.5px solid rgba(200,80,80,0.5);  color: var(--primary); }
+.toast-warn  { background: rgba(237, 237, 237, 0.98); border: 0.5px solid rgba(232,184,90,0.4); color: var(--primary); }
