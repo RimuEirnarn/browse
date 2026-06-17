@@ -9,6 +9,9 @@
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/utilities.css">
   <link rel="stylesheet" href="css/commands.css">
+  <link rel="stylesheet" href="css/widgets.css">
+  <link rel="stylesheet" href="css/toasts.css">
+  <link rel="stylesheet" href="css/modals.css">
   <script type="module" src="js/main.mjs" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -76,53 +79,28 @@
           <span class="prefix-chip" data-cid="/"><b>/</b> command</span>
           <span class="prefix-chip" data-cid="@"><b>@</b> bookmark</span>
           <span class="prefix-chip" data-cid="#"><b>#</b> history</span>
+          <span class="prefix-chip" data-cid="?"><b>?</b> ai search</span>
+          <span class="prefix-chip" data-cid=">"><b>></b> eval</span>
         </div>
 
         <div class="results" id="results">
-          <!-- <div class="result-item active">
-            <div class="result-icon url"><i class="nf nf-cod-globe" aria-hidden="true"></i></div>
-            <div class="result-text">
-              <div class="result-title">github.com/NekoRisya</div>
-              <div class="result-sub">https://github.com/NekoRisya</div>
-            </div>
-            <span class="result-badge badge-hist">recent</span>
-          </div>
-          <div class="result-item">
-            <div class="result-icon url"><i class="nf nf-cod-globe" aria-hidden="true"></i></div>
-            <div class="result-text">
-              <div class="result-title">Honkai: Star Rail — HoYoLAB</div>
-              <div class="result-sub">hoyolab.com/honkai</div>
-            </div>
-            <span class="result-badge badge-hist">recent</span>
-          </div>
-          <div class="result-item">
-            <div class="result-icon cmd"><i class="nf nf-cod-settings_gear" aria-hidden="true"></i></div>
-            <div class="result-text">
-              <div class="result-title">open system settings</div>
-              <div class="result-sub">/settings · system configuration</div>
-            </div>
-            <span class="result-badge badge-cmd">cmd</span>
-          </div>
-          <div class="result-item">
-            <div class="result-icon cmd"><i class="nf nf-cod-code" aria-hidden="true"></i></div>
-            <div class="result-text">
-              <div class="result-title">open netmesh dashboard</div>
-              <div class="result-sub">/netmesh · local node monitor</div>
-            </div>
-            <span class="result-badge badge-cmd">cmd</span>
-          </div>
-        </div> -->
+        </div>
 
-          <div class="divider"></div>
+        <div class="divider"></div>
 
-          <div class="bottom-bar">
-            <span class="status" id="palette_status"></span>
-            <div class="actions">
-            </div>
+        <div class="bottom-bar">
+          <span class="status" id="palette_status"></span>
+          <div class="actions">
           </div>
         </div>
       </div>
+      <!-- <div id="anchor-top-left" class="hud-anchor top-left"></div> -->
+      <div id="anchor-top-right" class="hud-anchor top-right"></div>
+      <!-- <div id="anchor-bottom-left" class="hud-anchor bottom-left"></div> -->
+      <div id="anchor-bottom-right" class="hud-anchor bottom-right"></div>
     </div>
+  </div>
+  <div id="toast-zone" class="toast-zone"></div>
 </body>
 
 </html>

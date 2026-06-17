@@ -3,6 +3,8 @@ import { bootSequence, systemLog } from "./boot.mjs"
 import { compute } from "./moodnr.mjs"
 import { init_palette } from "./palette.mjs"
 import { initialize_commands } from "./commands.mjs"
+import { mountWidgets } from "./widget.mjs"
+import "./commands/registries.mjs"
 
 /** @typedef {import("./moodnr.mjs").MNData} MNData */
 
@@ -68,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
   (() => {
     init_palette()
     initialize_commands()
+    mountWidgets()
     bootSequence.updateProgress()
     systemLog.info("Initialized core modules")
   })()

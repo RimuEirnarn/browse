@@ -69,6 +69,6 @@ export function compute({ aws, hpy, nr, bd, awf}) {
   }
   const nominator = data.aws[0] + data.hpy[0] + data.nr[0] + data.bd[0] + data.awf[0]
   const denominator = data.aws[1] + data.hpy[1] + data.nr[1] + data.bd[1] + data.awf[1]
-  console.log(data, nominator, denominator)
+  // console.log(data, nominator, denominator)
   return {score: (nominator / denominator), detail: data}
 }
