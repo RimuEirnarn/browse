@@ -14,7 +14,7 @@ export function query(selector) {
  * Tiny helper for inline "HTML"
  * @param {string} tag
  * @param {Object.<string, any>} props
- * @param  {...HTMLElement} children
+ * @param  {...HTMLElement|Node|string} children
  * @returns {HTMLElement}
  */
 export function e(tag, props, ...children) {
@@ -26,10 +26,21 @@ export function e(tag, props, ...children) {
   return element
 }
 
+/**
+ * @typedef {(props?: Object.<string, any>, ...children: (HTMLElement|Node|string)[])} Builder
+ */
+
+/**
+ * @type {Object.<string, Builder>}
+ */
 export const html = new Proxy({}, {
+  /**
+   *
+   * @param {any} _
+   * @param {string} tag
+   * @returns {}
+   */
   get(_, tag) {
-    /** @type {(props: Object.<string, any>, ...children: HTMLElement[]) => HTMLElement} */
-    const proxy = (props, ...children) => e(tag, props, ...children)
-    return proxy
+    return (props, ...children) => e(tag, props, ...children)
   }
 })
