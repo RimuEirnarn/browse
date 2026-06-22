@@ -65,7 +65,7 @@ export function initialize_first_time() {
   create_message(message, "Command-line start page ready", GENERIC_TEXT_CLASS, false)
   create_message(message, "Press <kbd class='silkscreen-bold text-white'>CTRL+K</kbd> to access command palette", "text-white mb-4")
   create_message(message, "Content Advisory:", "text-white mb-2")
-  create_message(message, "Some entries contain mature emotional themes such as isolation, depression, suicide, and mortality.", "mb-4 text-red")
+  create_message(message, "Some entries contain mature emotional themes such as isolation, depression, self-harm, suicide, and mortality.", "mb-4 text-red")
 
   const finalize_container = document.createElement("div")
   finalize_container.className = "finalize-panel"
