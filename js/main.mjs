@@ -7,6 +7,7 @@ import { init_user_widgets, initlaize_widgets } from "./widget.mjs"
 import "./commands/registries.mjs"
 import { initialize_theme } from "./theme.mjs"
 import { init_user_commands } from "./commands/registries.mjs"
+import { command_state } from "./state.mjs"
 import { initialize_first_time } from "./first-time.mjs"
 
 /** @typedef {import("./moodnr.mjs").MNData} MNData */
@@ -80,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
   systemLog.info("Initialized core modules")
   bootSequence.updateProgress()
 
+  window.command_state = command_state
   // setTimeout(() => bootSequence.updateProgress(), 1000)
   // setTimeout(() => bootSequence.updateProgress(), 1500)
   // setTimeout(() => bootSequence.updateProgress(), 2000)

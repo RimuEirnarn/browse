@@ -1,3 +1,5 @@
+import { command_state } from "./state.mjs"
+
 /**
  * @typedef FieldSchema
  * @prop {string} id
@@ -21,6 +23,8 @@
  * @returns
  */
 export function prompt(schema) {
+  command_state.context = "modals"
+  // TODO: Fix this mf by using helper we have in other branch
   return new Promise((resolve) => {
     const overlay = document.createElement('div')
     overlay.className = 'modal-overlay'
@@ -160,6 +164,7 @@ export function prompt(schema) {
       overlay.classList.remove('modal-visible')
       overlay.addEventListener('transitionend', () => overlay.remove(), { once: true })
       resolve(result)
+      command_state.context = ""
     }
 
     submit.addEventListener('click', () => {

@@ -1,4 +1,5 @@
 import { bootSequence, systemLog } from "./boot.mjs"
+import { command_state } from "./state.mjs"
 
 /** @type {HTMLDivElement} */
 const palette = document.querySelector("#palette")
@@ -10,6 +11,9 @@ export const open_callbacks = []
 export const close_callbacks = []
 
 export function openPalette() {
+  if (command_state.disallow_context.includes(command_state.context) || command_state.triggered) return;
+  command_state.context = "command"
+  command_state.triggered = true
   palette.style.display = "block"
   palette.classList.add("solving")
   setTimeout(() => {
@@ -22,6 +26,7 @@ export function openPalette() {
 
 export function closePalette() {
   palette.classList.add("dissolving-fast")
+  command_state.triggered = false
   setTimeout(() => {
     palette.style.display = ""
     palette_input.blur()
