@@ -33,7 +33,7 @@ ruler.style.cssText = `
   opacity: 0;
   white-space: pre;
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 10px;
 `
 document.body.appendChild(ruler)
 

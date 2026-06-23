@@ -17,8 +17,8 @@
   border: 0.5px solid color-mix(in srgb, var(--primary) 25%, transparent);
   border-radius: 6px;
   padding: 8px 12px;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-family: var(--font-readable);
+  font-size: 18px;
   color: var(--primary);
   backdrop-filter: blur(6px);
 }
