@@ -9,7 +9,6 @@ class SystemLogger {
     this.name = name;
     this.logs = [];
     this.levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    this.callback = [console.debug, console.info, console.warn, console.error, console.error]
     this.level_limit = typeof level_limit == 'string' ? this.levels.indexOf(level_limit) : level_limit
   }
 
@@ -24,8 +23,7 @@ class SystemLogger {
     const timestamp = new Date().toISOString();
     const entry = { timestamp, level, message, module: this.name };
     this.logs.push(entry);
-    const fn = this.callback[level_index]
-    fn(`[${level.toUpperCase().padEnd(5, " ")}] [${this.name}] ${message}`);
+    console.log(`[${level.toUpperCase().padEnd(5, " ")}] [${this.name}] ${message}`);
 
     // Push to system log element
     const syslogElement = document.querySelector(".boot-syslog");
@@ -85,6 +83,8 @@ class BootSequence {
     this.diff = 0;
     this.diffOffset = 0;
     this.logger = new SystemLogger("BootSequence", level_limit);
+    this.startTime = 0;
+    this.endTime = 0;
   }
 
   /**
@@ -102,6 +102,7 @@ class BootSequence {
       return false;
     }
 
+    this.startTime = performance.now()
     this.logger.info("Boot sequence initialized");
     this.logger.info(`Running boot scripts (${this.maxStep} in total)`)
     return true;
@@ -146,7 +147,9 @@ class BootSequence {
 
   complete() {
     // clearInterval(this.bootInterval);
+    this.endTime = performance.now()
     this.logger.info("Boot sequence completed");
+    this.logger.info(`Bootloader completed for ${((this.endTime - this.startTime) / 1000).toFixed(2)}s`)
 
     const bootloader = document.querySelector(".bootloader");
     if (bootloader) {
@@ -160,8 +163,16 @@ class BootSequence {
 
       setTimeout(() => {
         bootloader.remove();
-        this.logger.info("Bootloader UI removed");
+        this.logger.info("Bootloader UI removed, sending off event");
         document.documentElement.style.overflow = ""
+        document.dispatchEvent(new CustomEvent("bootloader.complete", {detail: {
+          modules: this.maxStep,
+          time: {
+            start: this.startTime,
+            end: this.endTime,
+            delta: this.endTime - this.startTime
+          }
+        }}))
       }, 800);
     }
   }
