@@ -1,0 +1,331 @@
+const SANDBOX_HTML = `<!DOCTYPE html><html><body><script>
+const _parent = window.parent;
+let persistedState = $[userspace]
+let activeWorker = null;
+
+window.addEventListener('message', (e) => {
+  // if (e.origin !== 'null') return;
+  const { type, runId, code, api } = e.data ?? {};
+  if (type !== 'run') return;
+
+  // Spin up a worker for this run
+  // console.log(type, runId, code, api)
+  // console.log('[iframe] injecting state into worker:', JSON.stringify(persistedState));
+  const workerSrc = buildWorkerSrc(code, api, persistedState);
+  const blob = new Blob([workerSrc], { type: 'application/javascript' });
+  const url = URL.createObjectURL(blob);
+  const worker = new Worker(url);
+  activeWorker = worker;
+
+  const timer = setTimeout(() => {
+    activeWorker?.terminate(); // hard kill, no cooperation needed
+    activeWorker = null;
+    URL.revokeObjectURL(url);
+    _parent.postMessage({ type: 'result', runId, error: 'Execution timed out' }, '*');
+  }, 100000);
+
+  activeWorker.onmessage = (e) => {
+    const msg = e.data;
+
+    if (e.data?.type === 'log') {
+      console.log('[sandbox]', e.data.msg);
+      return;
+    }
+
+    if (msg.type === 'call') {
+      // Worker wants to invoke a parent-exposed fn
+      // Forward to parent, await response, forward back
+      /**const callId = msg.callId;
+      const handler = (pe) => {
+        if (pe.origin !== location.origin && pe.origin !== 'null') return;
+        if (pe.data?.type !== 'callResult') return;
+        if (pe.data.callId !== callId) return;
+        window.removeEventListener('message', handler);
+        worker.postMessage(pe.data); // relay back to worker
+      };
+      window.addEventListener('message', handler);*/
+      _parent.postMessage(msg, '*'); // forward call up to parent
+      return;
+    }
+
+    if (msg.type === 'result') {
+      if (msg.state) persistedState = msg.state;
+      clearTimeout(timer);
+      activeWorker?.terminate();
+      activeWorker = null;
+      URL.revokeObjectURL(url);
+      _parent.postMessage({ type: 'result', runId, ...msg }, '*');
+    }
+  };
+
+  activeWorker.onerror = (err) => {
+    clearTimeout(timer);
+    activeWorker?.terminate();
+    activeWorker = null;
+    URL.revokeObjectURL(url);
+    _parent.postMessage({ type: 'result', runId, error: err.message }, '*');
+  };
+});
+
+// Messages from parent (callResult coming back down)
+window.addEventListener('message', (e) => {
+  if (e.source !== _parent) return;  // must be from parent, not null origin
+  if (e.data?.type !== 'callResult') return;
+
+  // Find which worker is waiting for this callId and relay
+  if (activeWorker) {
+    activeWorker.postMessage(e.data);
+  }
+});
+
+
+function buildWorkerSrc(code, api, initialState) {
+  return \`
+const _savedRandom = crypto.randomUUID.bind(crypto);
+const stubs = {};
+
+// const BLOCKED = ['document', 'window', 'location', 'localStorage', 'sessionStorage', 'indexedDB', 'fetch', 'WebSocket', 'XMLHttpRequest']
+// BLOCKED.forEach(k => { try { Object.defineProperty(window, k, { value: undefined, configurable: false }); } catch(e){} });
+
+\${api.map(name => \`
+stubs['\${name}'] = (...args) => new Promise((resolve, reject) => {
+  const callId = _savedRandom();
+  const handler = (e) => {
+    if (e.data?.type !== 'callResult') return;
+    if (e.data.callId !== callId) return;
+    removeEventListener('message', handler);
+    if (e.data.error) reject(new Error(e.data.error));
+    else resolve(e.data.result);
+  };
+  addEventListener('message', handler);
+  postMessage({ type: 'call', callId, name: '\${name}', args });
+});
+\`).join('')}
+
+const userVars = Object.create(null);
+// top of worker, before proxy setup
+//const initialState = \${JSON.stringify(initialState)};
+Object.assign(userVars, \${JSON.stringify(initialState)});
+// postMessage({ type: 'log', msg: 'worker booted with vars: ' + JSON.stringify(Object.fromEntries(Object.entries(userVars))) });
+const proxy = new Proxy(userVars, {
+  get: (t, k) => {
+    if (k in stubs) return stubs[k];
+    if (k in t) return t[k];
+    return ReferenceError(\\\`\\\${String(k)} is not defined\\\`)
+  },
+  set: (t, k, v) => { t[k] = v; return true; },
+  has: () => true,
+});
+// console.log(initialState)
+
+(async () => {
+  try {
+    const fn = new Function('__s', \\\`with(__s){ return (async()=>{ \${code} })(); }\\\`);
+    const result = await fn(proxy);
+    const state = Object.create(null)
+    for (const [k, v] of Object.entries(userVars)) {
+      try {
+        structuredClone(v);
+        state[k] = v;
+      } catch {
+        postMessage({ type: 'log', level: 'warn', msg: \\\`var '\\\${k}' lost between runs (not serializable)\\\` });
+      }
+    }
+    postMessage({ type: 'result', result, state });
+  } catch(err) {
+    postMessage({ type: 'result', error: err.message });
+  }
+})();
+  \`;
+}
+
+_parent.postMessage({ type: 'ready' }, '*');
+<\/script></body></html>`
+
+class IframeSandbox {
+  #iframe;
+  #ready;
+  /**
+   * @type {Map<string, [(value: any) => void, (value: any) => void]>}
+   */
+  #pending = new Map(); // callId → {resolve, reject}
+  #callId = 0;
+  #messageHandler = null;
+  #state = {}
+
+  constructor() {
+    this.#reinit()
+  }
+
+  #reinit() {
+    if (this.#messageHandler) {
+      window.removeEventListener('message', this.#messageHandler)
+    }
+    /** @type {HTMLIframeElement} */
+    this.#iframe = document.createElement('iframe');
+    this.#iframe.sandbox = 'allow-scripts';
+    this.#iframe.origin
+    this.#iframe.style.display = 'none';
+    const data = localStorage.getItem('lunaeri-userspace') ?? '{}'
+    this.#state = JSON.parse(data)
+    this.#iframe.srcdoc = SANDBOX_HTML.replace("$[userspace]", data); // defined below
+    document.body.appendChild(this.#iframe);
+
+    this.#ready = new Promise(resolve => {
+      this.#messageHandler = (e) => {
+        if (e.source !== this.#iframe.contentWindow) return;
+        if (e.data?.type === 'ready') resolve();
+        if (e.data?.type === 'call') this.#handleCall(e.data);
+      };
+      window.addEventListener('message', this.#messageHandler)
+    });
+  }
+
+  // Sandbox wants to invoke a parent-side function
+  #handleCall({ callId, name, args, port }) {
+    const entry = this.#pending.get(name);
+    // 'name' here is the exposed fn name, not a pending run
+    // we keep exposed fns separately
+    try {
+      const result = this.#exposed[name]?.(...args);
+      Promise.resolve(result).then(val => {
+        this.#iframe.contentWindow.postMessage(
+          { type: 'callResult', callId, result: val }, '*'
+        );
+      });
+    } catch (err) {
+      this.#iframe.contentWindow.postMessage(
+        { type: 'callResult', callId, error: err.message }, '*'
+      );
+    }
+  }
+
+  #exposed = {};
+  #runId = 0;
+  /** @type {Map<string, [(value: any) => void, (value: any) => void]>} */
+  #runs = new Map(); // runId → {resolve, reject}
+
+  /**
+   * Expose Interface to interact with to sandbox
+   * @param {Record<string, any>} api
+   * @returns
+   */
+  expose(api) {
+    // api: { fnName: actualFunction, ... }
+    this.#exposed = api;
+    return this;
+  }
+
+  async #doRun(code) {
+    await this.#ready;
+    const currentIframe = this.#iframe;
+
+    // Descriptor: tell sandbox which names exist, not the functions themselves
+    const apiDescriptor = Object.keys(this.#exposed);
+    const runId = this.#runId++;
+
+    return new Promise((resolve, reject) => {
+      this.#runs.set(runId, { resolve, reject });
+
+      // One-time listener for this specific run's result
+      const handler = (e) => {
+        if (e.source !== currentIframe.contentWindow) return;
+        if (e.data?.type === 'log') {
+          console.log('[sandbox]', e.data.msg);
+          return;
+        }
+        if (e.data?.type !== 'result') return;
+        if (e.data.runId !== runId) return;
+        if (e.data.state) {
+          this.#state = e.data.state;
+          localStorage.setItem("lunaeri-userspace", JSON.stringify(e.data.state))
+        }
+
+        window.removeEventListener('message', handler);
+        this.#runs.delete(runId);
+
+        if (e.data.error) reject(new Error(e.data.error));
+        else resolve(e.data.result);
+      };
+
+      window.addEventListener('message', handler);
+
+      currentIframe.contentWindow.postMessage({
+        type: 'run',
+        runId,
+        code,
+        api: apiDescriptor,
+      }, '*');
+    });
+  }
+
+  /**
+   * Run sandboxed code, not guaranteed to be secure.
+   * Has 100s of timeout.
+   * @param {string} code
+   * @returns
+   */
+  async run(code) {
+    return Promise.race([
+      this.#doRun(code),
+      new Promise((_, reject) => setTimeout(() => {
+        this.destroy()
+        this.#reinit()
+        reject(new Error("Execution timeout"))
+      }, 100000))
+    ])
+  }
+
+  /**
+   * Destroy current iframe instance
+   */
+  destroy() {
+    this.#iframe.remove();
+  }
+
+  /**
+   * Get userspace variables
+   * @returns {Object.<string, any>}
+   */
+  getState() {
+    return this.#state
+  }
+}
+
+const sandbox = new IframeSandbox();
+
+sandbox.expose({
+  add: (a, b, c) => a + b + c,
+  print: (...args) => { console.log('[sandbox]', ...args) },
+  fetcher: async () => {
+    const r = await fetch(`https://rimueirnarn.pythonanywhere.com/api/revision`); // parent does the real fetch
+    return r.json();
+  },
+});
+
+function test() {
+  document.addEventListener("DOMContentLoaded", async () => {
+    // Persistent userspace across runs
+    // console.count()
+    await sandbox.run("await print(x)")
+    await sandbox.run('x = await add(1, 2, 3)');
+    // console.count()
+    await sandbox.run('await print(x)');           // [sandbox] 6
+    // console.count()
+    await sandbox.run('y = x * 2');
+    // console.count()
+    await sandbox.run('await print(y)');           // [sandbox] 12
+    // console.count()
+
+    // document, fetch, localStorage etc. are all undefined inside
+    await sandbox.run('await print(document)');    // [sandbox] undefined
+    await sandbox.run('await print(fetch)');       // [sandbox] undefined
+    await sandbox.run("await print(localStorage)")
+    await sandbox.run("await print(parent)")
+    await sandbox.run('await print(await fetcher())')
+    await sandbox.run('await print(console)')
+    // await sandbox.run('while (true){}')
+
+    setTimeout(() => sandbox.printState(), 10000)
+  })
+}
