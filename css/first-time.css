@@ -1,0 +1,90 @@
+.first-time-dweller {
+  background: rgba(0, 0, 0, 0.95);
+  position: absolute;
+  top: 0;
+  width: 100dvw;
+  height: 100dvh;
+  max-height: 100dvh;
+  max-width: 100dvw;
+  min-width: 100dvw;
+  min-height: 100dvh;
+  z-index: 999999998;
+  transition: opacity 0.15s;
+  opacity: 0;
+}
+
+.message {
+  margin-top: 8rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 24rem;
+  text-align: center;
+}
+
+.first-time-dweller.ft-visible {
+  opacity: 1;
+}
+
+.finalize-ftd {
+  /* border-radius: 5px; */
+  /* border: 0.5px solid; */
+  /* border-color: color-mix(in srgb, var(--primary) 40%, transparent); */
+  /* background: color-mix(in srgb, var(--primary) 30%, transparent); */
+  border: 0;
+  background: rgba(0, 0, 0, 0.95);
+  font-family: "Press Start 2p";
+  font-size: 12px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.finalize-panel {
+  /* width: 125%; */
+  /* height: 125%; */
+  background: rgba(0, 0, 0, 1);
+  width: 16%;
+  position: relative;
+  /* width: fit-content; */
+  margin-left: auto;
+  margin-right: auto;
+  transition: width 0.2s, background 0.2s;
+  --border-color: white;
+  --bt-sizing: 10px;
+  /* cursor: pointer; */
+}
+
+.finalize-panel:hover {
+  width: 20%;
+  /* background: rgba(var(--primary), 0.8); */
+  --border-color: red;
+  --bt-sizing: 12px;
+}
+
+.finalize-panel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--bt-sizing);
+
+  border-left: 4px solid var(--border-color);
+  border-top: 4px solid var(--border-color);
+  border-bottom: 4px solid var(--border-color);
+  transition: border 0.2s, width 0.2s;
+}
+
+.finalize-panel::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--bt-sizing);
+
+  border-right: 4px solid var(--border-color);
+  border-top: 4px solid var(--border-color);
+  border-bottom: 4px solid var(--border-color);
+  transition: border 0.2s, width 0.2s;
+}

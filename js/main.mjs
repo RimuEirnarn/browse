@@ -8,11 +8,12 @@ import "./commands/registries.mjs"
 import { initialize_theme } from "./theme.mjs"
 import { init_user_commands } from "./commands/registries.mjs"
 import { command_state } from "./state.mjs"
+import { initialize_first_time } from "./first-time.mjs"
 
 /** @typedef {import("./moodnr.mjs").MNData} MNData */
 
-const max_step = 9;
-const version = "v0.0.1"
+const max_step = 10;
+const version = "v0.0.2"
 document.addEventListener("DOMContentLoaded", () => {
   systemLog.info("System loaded");
 
@@ -70,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     systemLog.error(`Failed to load system status: ${err.message}`);
   });
 
+  initialize_first_time()
   initialize_theme()
   init_palette()
   init_user_widgets()
