@@ -25,6 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
   request_json(`https://rimueirnarn.pythonanywhere.com/api/revision?ts=${now()}`).then((value) => {
     document.querySelector(".lunae-version-info").textContent = value.data;
     systemLog.info(`Version info loaded: ${value.data}`);
+    if (value.data === "OFFLINE")
+      systemLog.error("Rimu's own status is offline")
     bootSequence.updateProgress()
   }).catch((err) => {
     systemLog.error(`Failed to load version info: ${err.message}`);

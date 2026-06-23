@@ -9,6 +9,7 @@ class SystemLogger {
     this.name = name;
     this.logs = [];
     this.levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    this.callback = [console.debug, console.info, console.warn, console.error, console.error]
     this.level_limit = typeof level_limit == 'string' ? this.levels.indexOf(level_limit) : level_limit
   }
 
@@ -23,7 +24,8 @@ class SystemLogger {
     const timestamp = new Date().toISOString();
     const entry = { timestamp, level, message, module: this.name };
     this.logs.push(entry);
-    console.log(`[${level.toUpperCase().padEnd(5, " ")}] [${this.name}] ${message}`);
+    const fn = this.callback[level_index]
+    fn(`[${level.toUpperCase().padEnd(5, " ")}] [${this.name}] ${message}`);
 
     // Push to system log element
     const syslogElement = document.querySelector(".boot-syslog");
