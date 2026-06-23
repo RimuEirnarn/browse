@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    const SANDBOX_HTML = `<!DOCTYPE html><html><body><script>
+const parent = window.parent; // grab ref before we shadow it
+const crypto = window.crypto;
+
+// Shadow everything dangerous immediately
+const BLOCKED = [
+  'parent','top','opener','frames','document','location',
+  'history','navigator','screen','crypto',
+  'fetch','XMLHttpRequest','WebSocket','EventSource',
+  'localStorage','sessionStorage','indexedDB','caches',
+  'importScripts','Worker','SharedWorker','ServiceWorker',
+];
+BLOCKED.forEach(k => { try { Object.defineProperty(window, k, { value: undefined, configurable: false }); } catch(e){} });
+
+// userspace state persists across runs
+const userVars = Object.create(null);
+const randomId = () => crypto.randomUUID()
+
+// Stub registry: name → async function that asks parent
+const stubs = {};
+
+function buildStub(name) {
+  return (...args) => new Promise((resolve, reject) => {
+    const callId = randomId();
+
+    const handler = (e) => {
+      if (e.data?.type !== 'callResult') return;
+      if (e.data.callId !== callId) return;
+      window.removeEventListener('message', handler);
+      if (e.data.error) reject(new Error(e.data.error));
+      else resolve(e.data.result);
+    };
+    window.addEventListener('message', handler);
+
+    // postMessage to real parent via the ref we saved
+    parent.postMessage({ type: 'call', callId, name, args }, '*');
+  });
+}
+
+window.addEventListener('message', async (e) => {
+  const { type, runId, code, api } = e.data ?? {};
+  if (type !== 'run') return;
+
+  // Rebuild stubs from descriptor
+  api.forEach(name => { stubs[name] = buildStub(name); });
+
+  // Proxy: userVars + stubs as the implicit scope
+  const proxy = new Proxy(userVars, {
+    get: (t, k) => k in stubs ? stubs[k] : t[k],
+    set: (t, k, v) => { t[k] = v; return true; },
+    has: () => true,
+  });
+
+  try {
+    // Allow await at top level by wrapping in async fn
+    const fn = new Function('__s', \`with(__s){ return (async()=>{ \${code} })(); }\`);
+    const result = await fn(proxy);
+    parent.postMessage({ type: 'result', runId, result }, '*');
+  } catch(err) {
+    parent.postMessage({ type: 'result', runId, error: err.message }, '*');
+  }
+});
+
+parent.postMessage({ type: 'ready' }, '*');
+<\/script></body></html>`;
+    class IframeSandbox {
+      #iframe;
+      #ready;
+      #pending = new Map(); // callId → {resolve, reject}
+      #callId = 0;
+
+      constructor() {
+        this.#reinit()
+      }
+
+      #reinit() {
+        /** @type {HTMLIframeElement} */
+        this.#iframe = document.createElement('iframe');
+        this.#iframe.sandbox = 'allow-scripts';
+        this.#iframe.origin
+        this.#iframe.style.display = 'none';
+        this.#iframe.srcdoc = SANDBOX_HTML; // defined below
+        document.body.appendChild(this.#iframe);
+
+        this.#ready = new Promise(resolve => {
+          window.addEventListener('message', e => {
+            if (e.source !== this.#iframe.contentWindow) return;
+            if (e.data?.type === 'ready') resolve();
+            if (e.data?.type === 'call') this.#handleCall(e.data);
+          });
+        });
+      }
+
+      // Sandbox wants to invoke a parent-side function
+      #handleCall({ callId, name, args, port }) {
+        const entry = this.#pending.get(name);
+        // 'name' here is the exposed fn name, not a pending run
+        // we keep exposed fns separately
+        try {
+          const result = this.#exposed[name]?.(...args);
+          Promise.resolve(result).then(val => {
+            this.#iframe.contentWindow.postMessage(
+              { type: 'callResult', callId, result: val }, '*'
+            );
+          });
+        } catch (err) {
+          this.#iframe.contentWindow.postMessage(
+            { type: 'callResult', callId, error: err.message }, '*'
+          );
+        }
+      }
+
+      #exposed = {};
+      #runId = 0;
+      #runs = new Map(); // runId → {resolve, reject}
+
+      expose(api) {
+        // api: { fnName: actualFunction, ... }
+        this.#exposed = api;
+        return this;
+      }
+
+      async #doRun(code) {
+        await this.#ready;
+
+        // Descriptor: tell sandbox which names exist, not the functions themselves
+        const apiDescriptor = Object.keys(this.#exposed);
+        const runId = this.#runId++;
+
+        return new Promise((resolve, reject) => {
+          this.#runs.set(runId, { resolve, reject });
+
+          // One-time listener for this specific run's result
+          const handler = (e) => {
+            if (e.source !== this.#iframe.contentWindow) return;
+            if (e.data?.type !== 'result') return;
+            if (e.data.runId !== runId) return;
+
+            window.removeEventListener('message', handler);
+            this.#runs.delete(runId);
+
+            if (e.data.error) reject(new Error(e.data.error));
+            else resolve(e.data.result);
+          };
+
+          window.addEventListener('message', handler);
+
+          this.#iframe.contentWindow.postMessage({
+            type: 'run',
+            runId,
+            code,
+            api: apiDescriptor,
+          }, '*');
+        });
+      }
+
+      async run(code, timeout = 5000) {
+        return Promise.race([
+          this.#doRun(code),
+          new Promise((_, reject) => setTimeout(() => {
+            this.destroy()
+            this.#reinit()
+            reject(new Error("Execution timeout"))
+          }, timeout))
+        ])
+      }
+
+      destroy() {
+        this.#iframe.remove();
+      }
+    }
+
+    const sandbox = new IframeSandbox();
+
+    sandbox.expose({
+      add: (a, b, c) => a + b + c,
+      print: (...args) => console.log('[sandbox]', ...args),
+      fetcher: async () => {
+        const r = await fetch(`https://rimueirnarn.pythonanywhere.com/api/revision`); // parent does the real fetch
+        return r.json();
+      },
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Persistent userspace across runs
+      await sandbox.run('x = await add(1, 2, 3)');
+      await sandbox.run('print(x)');           // [sandbox] 6
+      await sandbox.run('y = x * 2');
+      await sandbox.run('print(y)');           // [sandbox] 12
+
+      // document, fetch, localStorage etc. are all undefined inside
+      await sandbox.run('print(document)');    // [sandbox] undefined
+      await sandbox.run('print(fetch)');       // [sandbox] undefined
+      await sandbox.run("print(localStorage)")
+      await sandbox.run("print(parent)")
+      await sandbox.run('print(await fetcher())')
+      await sandbox.run('print(console)')
+      await sandbox.run('while (true){}')
+    })
+  </script>
+</body>
+
+</html>
