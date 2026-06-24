@@ -2,8 +2,7 @@
 
 Lunaeri is a Pixel + Tech Sci-fi (inspired from Arknights: Endfield) Personal Workspace Environment that can be used as Browser start page (new tab).
 
-In later plan, Lunaeri will be extended from
-mere start page to an actual system that can spawn various mechanism defined through Userspace Environment (UE) and Userspace Environment Application Processing Interface (UE API) that can be accessed through Command Palette and Terminal Interface.
+What begins as a start page is planned to expand into a fully interconnected system. At its core lies the Operator Manifold (OM), a personal construct-space unique to each operator, functioning as both instrument and inhabited environment, shaped by use. All mechanisms and processes within the Manifold are exposed and controlled through the Manifold Binding Protocol (MBP), reachable via the Command Palette and Terminal Interface.
 
 ## Content Advisory
 
