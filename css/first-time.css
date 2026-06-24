@@ -36,7 +36,8 @@
   font-size: 12px;
   padding: 7px 16px;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
+  color: var(--btn-color);
 }
 
 .finalize-panel {
@@ -51,6 +52,7 @@
   transition: width 0.2s, background 0.2s;
   --border-color: white;
   --bt-sizing: 10px;
+  --btn-color: #fafafa;
   /* cursor: pointer; */
 }
 
@@ -59,6 +61,7 @@
   /* background: rgba(var(--primary), 0.8); */
   --border-color: red;
   --bt-sizing: 12px;
+  --btn-color: red;
 }
 
 .finalize-panel::before {

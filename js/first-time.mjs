@@ -71,7 +71,7 @@ export function initialize_first_time() {
   finalize_container.className = "finalize-panel"
 
   const finalize = document.createElement("button")
-  finalize.className = "finalize-ftd text-white"
+  finalize.className = "finalize-ftd"
   finalize.textContent = "Initialize"
   finalize_container.appendChild(finalize)
   message.appendChild(finalize_container)
