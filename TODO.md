@@ -16,6 +16,8 @@ What features should I bring up next:
 - [ ] Improvise first time experience
 - [ ] Add story, poems, and stuff
 - [ ] Introduce Terminal Interface
+- [ ] Add SFX and Ambiences
+- [ ] Add nametagging nodes. Use localStorage for pseudo Authentication, communicate through `/api/lunaeri/auth` and `/api/lunaeri/*`
 
 <!--
 What, do you think I'm going to expose ████████ Interface?
