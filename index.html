@@ -5,23 +5,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LUNAERI System</title>
-  <link rel="stylesheet" href="css/colors.css">
+  <!-- <link rel="stylesheet" href="css/colors.css">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/utilities.css">
   <link rel="stylesheet" href="css/commands.css">
   <link rel="stylesheet" href="css/widgets.css">
   <link rel="stylesheet" href="css/toasts.css">
   <link rel="stylesheet" href="css/modals.css">
-  <link rel="stylesheet" href="css/first-time.css">
+  <link rel="stylesheet" href="css/first-time.css"> -->
   <script type="module" src="js/main.mjs" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Jersey+10&family=Micro+5&family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <link blocking="render"
+    href="https://fonts.googleapis.com/css2?family=Chewy&family=Jersey+10&family=Micro+5&family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap"
+    rel="stylesheet">
+  <style id="fouc">html,body{background:rgb(0 0 0);overflow:hidden;padding:0;margin:0;font-family:"Press Start 2P",monospace}.bootloader-error{--bootloader-color:#fd4040 !important}.bootloader{--bootloader-color:#B3EBF2;--bootloader-color-default:#B3EBF2;background:rgb(0 0 0);z-index:999999999;position:absolute;height:100dvh;width:100dvw}.loader-info{position:absolute;transition:all;bottom:1rem;left:0rem;color:var(--bootloader-color);font-size:xx-large}.progress{background-color:#000;width:100dvw;min-width:100dvw}.progress>div{width:0%;background-color:var(--bootloader-color);height:3px;transition:all}.syslog-entry{line-height:1;font-size:.75rem}.boot-syslog{position:absolute;left:0rem;color:var(--bootloader-color-default);transition:all;bottom:4rem;overflow:hidden}.bootloader-content{bottom:0;left:0;position:absolute}.syslog-level-warn{color:orange}.syslog-level-error{color:#fd4040}</style>
+  <script src="js/loader.mjs" type="module" defer></script>
 </head>
 
 <body>
   <div class="bootloader w-fixed w-100dv h-100dv h-fixed absolute">
-    <div class="bottom left absolute">
+    <div class="bootloader-content bottom left absolute">
       <div class="boot-syslog"></div>
       <div class="loader-info">0%</div>
       <div class="progress w-100 w-fixed">

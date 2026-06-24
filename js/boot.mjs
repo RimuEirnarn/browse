@@ -29,7 +29,7 @@ class SystemLogger {
     const syslogElement = document.querySelector(".boot-syslog");
     if (syslogElement) {
       const logLine = document.createElement("div");
-      logLine.classList.add("syslog-entry")
+      logLine.classList.add("syslog-entry", `syslog-level-${level.toLowerCase()}`)
       logLine.textContent = `[${timestamp}] [${level.toUpperCase().padEnd(5, " ")}] [${this.name}] ${message}`;
       syslogElement.appendChild(logLine);
       // Auto-scroll to bottom
@@ -87,14 +87,18 @@ class BootSequence {
     this.endTime = 0;
   }
 
+  refetch() {
+    this.bootloaderPg = document.querySelector(".progress > div");
+    this.bootloaderInfo = document.querySelector(".loader-info");
+  }
+
   /**
    * Initialize boot sequence, when sequence limit is not passed, will use already instantiated value.
    * @param {number?} sequence_limit
    * @returns
    */
   initialize(sequence_limit) {
-    this.bootloaderPg = document.querySelector(".progress > div");
-    this.bootloaderInfo = document.querySelector(".loader-info");
+    this.refetch()
     this.maxStep = !sequence_limit ? this.sequence_limit : sequence_limit
 
     if (!this.bootloaderPg || !this.bootloaderInfo) {
@@ -120,10 +124,10 @@ class BootSequence {
   draw() {
     const progressRatio = this.width / 100;
     // Update UI
-    this.bootloaderInfo.textContent = `${(this.width * 100).toFixed(2)}%`;
+    if (this.bootloaderInfo) this.bootloaderInfo.textContent = `${(this.width * 100).toFixed(2)}%`;
     // Max size must be below updated text content.
     const maxSize = document.documentElement.clientWidth - this.bootloaderInfo.offsetWidth;
-    this.bootloaderPg.style.width = `${this.width * 100}%`;
+    if (this.bootloaderPg) this.bootloaderPg.style.width = `${this.width * 100}%`;
 
     // Handle positioning changes
     if (maxSize !== this.diff) {
@@ -132,7 +136,7 @@ class BootSequence {
       this.diffOffset = this.bootloaderInfo.offsetWidth;
     }
 
-    this.bootloaderInfo.style.left = `${progressRatio * maxSize}px`;
+    if (this.bootloaderInfo) this.bootloaderInfo.style.left = `${progressRatio * maxSize}px`;
   }
 
   updateProgress() {

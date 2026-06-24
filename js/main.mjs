@@ -12,15 +12,9 @@ import { initialize_first_time } from "./first-time.mjs"
 
 /** @typedef {import("./moodnr.mjs").MNData} MNData */
 
-const max_step = 10;
 const version = "v0.0.2"
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("lunaeri.bootload-start", () => {
   systemLog.info("System loaded");
-
-  if (!bootSequence.initialize(max_step)) {
-    systemLog.error("Failed to initialize boot sequence");
-  }
-  bootSequence.start();
 
   document.querySelectorAll(".version").forEach(element => element.textContent = version)
 
