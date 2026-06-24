@@ -14,6 +14,8 @@ What features should I bring up next:
 - [ ] Streamline execution
 - [ ] Modernize layouts (Command Palette, Modals, Toasts, Widgets) through streamlined ENDFIELD-inspired layout and Pixel Art ones
 - [ ] Improvise first time experience
+- [ ] Add story, poems, and stuff
+- [ ] Introduce Terminal Interface
 
 <!--
 What, do you think I'm going to expose ████████ Interface?
