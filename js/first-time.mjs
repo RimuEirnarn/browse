@@ -79,11 +79,13 @@ export function initialize_first_time() {
   document.body.appendChild(overlay)
   requestAnimationFrame(() => overlay.classList.add('ft-visible'))
 
-  finalize.addEventListener("click", () => {
+  const base = () => {
     localStorage.setItem("lunaeri-first-time", "initialized")
     overlay.classList.remove('ft-visible')
     overlay.addEventListener("transitionend", () => overlay.remove(), { once: true})
-  })
+  }
+  finalize_container.addEventListener("click", base);
+  finalize.addEventListener('click', base)
   systemLog.info("Initialized first time experience")
   bootSequence.updateProgress()
 }
