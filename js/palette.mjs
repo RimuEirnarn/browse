@@ -21,18 +21,21 @@ export function openPalette() {
     palette_input.select()
     palette.classList.remove("solving")
     open_callbacks.forEach(val => val())
+    document.dispatchEvent(new CustomEvent("lunaeri.palette.opened"))
   }, 300)
 }
 
 export function closePalette() {
   palette.classList.add("dissolving-fast")
   command_state.triggered = false
+  command_state.context = ""
   setTimeout(() => {
     palette.style.display = ""
     palette_input.blur()
     palette.classList.remove("dissolving-fast")
     palette_input.value = ""
     close_callbacks.forEach(val => val())
+    document.dispatchEvent(new CustomEvent("lunaeri.palette.closed"))
   }, 300)
 }
 
