@@ -120,6 +120,58 @@ body {
 .syslog-level-warn { color: orange }
 .syslog-level-error { color: #fd4040 }
 
+.main {
+  /* --t: clamp(0, calc((1650px - 100dvw) / 400), 1);
+  --ratio: calc(10 + 3 * var(--t));
+  --sidebar-width: calc(var(--ratio) * 1dvw); */
+  /* --sidebar-width: calc(
+    (10 + 3 * clamp(0, calc((1650px - 100dvw) / 400px), 1))
+    * 1dvw); */
+  /* --sidebar-width: clamp(10dvw,
+    calc(22.375dvw - 204px),
+    13dvw); */
+  --sidebar-width: 10dvw;
+  --main-width: calc(100dvw - var(--sidebar-width));
+}
+
+.sidebar-width {
+  width: var(--sidebar-width);
+}
+
+.main-content {
+  width: var(--main-width)
+}
+
+@media (min-width: 1250px) and (max-width: 1350px) {
+    .main {
+      --sidebar-width: 13dvw;
+    }
+}
+
+@media (min-width: 1350px) and (max-width: 1650px) {
+  .main {
+    --sidebar-width: 12dvw;
+  }
+}
+
+@media (min-width: 1651) {
+  .main {
+    --sidebar-width: 10dvw;
+  }
+}
+
+/* @media (min-width: ) */
+
+/* @media (min-width: 1250) and (max-width: 1650) {
+  .sidebar-width {
+    --width: 13dvw;
+  }
+
+  .main-content {
+    --width:  87dvw;
+  }
+} */
+
 @keyframes dissolveAnim {
   0% {
     opacity: 1;
